@@ -1,73 +1,53 @@
 #include<iostream>
 #include<vector>
-
+#include<algorithm>
 using namespace std;
 
-struct island
+vector<pair<int, int>> g[100];
+int N;
+int dfs(int n, int from, int (*f)(int, int))
 {
-  bool islast;
-  vector<int> to;
-  vector<int> time;
-};
-
-island islands[20];
-
-int big(int n, int t, int from)
-{
-  cout << "big";
-  if(n && islands[n].to.size() == 1)
-    return 0;
-  int a = 0;
-  for(int i = 0; i < islands[n].time.size(); i++)
+  int res = 0;
+  for(int i = 0; i < g[n].size(); i++)
   {
-    if(islands[n].to[i] == from)
+    auto e = g[n][i];
+    if(e.second == from || g[e.second].size() == 1)
       continue;
-    if(islands[n].time[a] < islands[n].time[i])
-      a = i;
+    res = f(res, dfs(e.second, n, f) + e.first * 2);
   }
-  return big(islands[n].to[a], islands[n].time[a], n);
+  return res;
 }
 
-int dfs(int n, int t, int from)
+int max(int a, int b)
 {
-  cout << "from: " << from << " to: " << n << endl;
-  if(n && islands[n].to.size() == 1)
-    return 0;
-  int res = 0;
-  for(int i = 0; i < islands[n].to.size(); i++)
-  {
-    if(islands[n].to[i] == from)
-      continue;
-    res += dfs(islands[n].to[i], islands[n].time[i], n);
-  }
-  res += t;
+  return a > b ? a : b;
+}
 
-  return res;
+int add(int a, int b)
+{
+  return a + b; 
 }
 
 int main()
 {
-  int n;
   while(1)
   {
-    cin >> n;
-    if(!n)
+    cin >> N;
+    if(!N)
       break;
-    for(int i = 0; i < n - 1; i++)
+    for(int i = 0; i < N; i++)
+      g[i].clear();
+    for(int i = 0; i < N - 1; i++)
     {
       int a, b, t;
       cin >> a >> b >> t;
-      islands[a - 1].to.push_back(b - 1);
-      islands[a - 1].time.push_back(t);
-      islands[b - 1].to.push_back(a - 1);
-      islands[b - 1].time.push_back(t);
+      a--; b--;
+      g[a].push_back(make_pair(t, b));
+      g[b].push_back(make_pair(t, a)); 
     }
-    for(int i = 0; i < n; i++)
-    {
-      for(int j = 0; j < islands[i].to.size(); j++)
-      cout << "from: " << i + 1 << " to: " << islands[i].to[j] << " time: " << islands[i].time[j] << endl;
-    }
-    cout << dfs(0, islands[0].to[0], -1) * 2 - big(0, islands[0].to[0], -1) << endl;
+    for(int i = 0; i < N; i++)
+      sort(g[i].begin(), g[i].end());
+    cout << dfs(0, -1, add) - dfs(0, -1, max) / 2 << endl;
   }
   return 0;
 }
