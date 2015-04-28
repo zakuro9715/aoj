@@ -16,26 +16,10 @@ loop:
     return 0;
   for(int i = 0; i < H * 2 - 1; i++)
   {
-    if(i % 2)
+    for(int j = 0; j < W  - (i + 1) % 2; j++)
     {
-      for(int j = 0; j < W; j++)
-      {
-        cin >> mem[i][j * 2];
-      }
+      cin >> mem[i][j];
     }
-    else
-    {
-      for(int j = 0; j < W - 1; j++)
-      {
-        cin >> mem[i][j * 2 + 1];
-      }
-    }
-  }
-  for(int i = 0; i < H * 2 - 1; i++)
-  {
-    for(int j = 0; j < W * 2 - 1; j++)
-      cout << mem[i][j];
-    cout << endl;
   }
   d[0][0] = 1;
   queue<int> q;
@@ -44,25 +28,24 @@ loop:
   {
     int x = q.front(); q.pop();
     int y = q.front(); q.pop();
-    if(x == W * 2 - 1 && y == H * 2 - 1)
+    if(x == W - 1 && y == H - 1)
     {
-      cout << d[x][y] << endl;
+      cout << d[y][x] << endl;
       goto loop;
     }
     for(int i = 0; i < 4; i++)
     {
       int tx = x + dx[i];
       int ty = y + dy[i];
-      if(tx >= 0 && tx < W * 2 && ty >= 0 && ty < H * 21&& !d[tx][ty])
+      if(tx >= 0 && tx < W && ty >= 0 && ty < H && !d[ty][tx])
       {
-   /*     if(dx[i] == 1 && !mem[ty * 2][x] ||
-           dx[i] == -1 && !mem[ty * 2][tx] ||
-           dy[i] == 1 && !mem[y * 2 + 1][tx] ||
-           dy[i] == -1 && !mem[ty * 2 + 1][tx])*/
-        if(!mem[ty][tx])
+        if(dx[i] == 1 && !mem[y * 2][x] ||
+           dx[i] == -1 && !mem[y * 2][tx] ||
+           dy[i] == 1 && !mem[y * 2 + 1][x] ||
+           dy[i] == -1 && !mem[ty * 2 + 1][x])
         {
           q.push(tx); q.push(ty);
-          d[tx][ty] = d[x][y] + 1;
+          d[ty][tx] = d[y][x] + 1;
         }
       }
     }
