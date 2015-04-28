@@ -1,13 +1,22 @@
 #include<iostream>
-
+#include<vector>
 using namespace std;
 
-int cnt[10001][1261], sum[10001][1261], N, M, R, Q;
+typedef pair<int, int> P;
+
+vector<P> p[10001];
+int c[10001][2];
+int N, M, R, Q;
+
 int main()
 {
- loop:;
-  fill((int*)cnt, (int*)cnt + 10001 * 1261, 0);
-  fill((int*)sum, (int*)sum + 10001 * 1261, 0);
+ loop:
+  for(int i = 0; i < 10001; i++)
+  {
+    c[i][0] = -1;
+    c[i][1] = 0;
+    p[i].clear();
+  }
   cin >> N >> M;
   if(!N)
     return 0;
@@ -17,25 +26,39 @@ int main()
     int t, n, m, s;
     cin >> t >> n >> m >> s;
     if(s)
-      cnt[m][t]++;
-    else
-      cnt[m][t]--;
-  }
-  for(int m = 1; m <= M; m++)
-  { 
-    for(int i = 1; i <= 1260; i++)
     {
-      cnt[m][i] = cnt[m][i - 1] + cnt[m][i];
-      sum[m][i] = sum[m][i - 1] + (cnt[m][i] ? 1 : 0);
+      if(c[m][0] == -1)
+        c[m][0] = t;
+      c[m][1]++;
+    }
+    else
+    {
+      if(!(--c[m][1]))
+      {
+        p[m].push_back(make_pair(c[m][0], t));
+        c[m][0] = -1;
+      }
     }
   }
   cin >> Q;
   for(int i = 0; i < Q; i++)
   {
-    int ts, te, m;
+    int ts, te, m, a = 0;
     cin >> ts >> te >> m;
-    cout << sum[m][te - 1] - sum[m][ts] << endl;
+    for(auto e: p[m])
+    {
+      if(e.second < ts || te < e.first)
+        continue;
+      if(ts <= e.first && e.second <= te)
+        a += e.second - e.first;
+      else if(ts <= e.first)
+        a += te - e.first;
+      else if(e.second <= te)
+        a += e.second - ts;
+      else
+        a += te - ts;
+    }
+    cout << a << endl;
   }
-  cout << sum[1][650] << " " << sum[1][550] << endl;
   goto loop;
 }
